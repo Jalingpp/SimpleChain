@@ -12,6 +12,7 @@ import (
 	"simplechain/network"
 	"simplechain/storage"
 	"simplechain/utils"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -110,7 +111,6 @@ func (fullnode *Fullnode) HandleRequest(b []byte) {
 	//将接收到的消息放入消息池
 	fullnode.mpmutex.Lock()
 	fullnode.MessagePool = append(fullnode.MessagePool, b)
-	fmt.Println("node", fullnode.NodeID, "的fullnode.MessagePool中消息数：", len(fullnode.MessagePool))
 	fullnode.mpmutex.Unlock()
 }
 
@@ -143,7 +143,7 @@ func (fullnode *Fullnode) PackBlock(height int, prevhash []byte) *blockchain.Blo
 	// 在循环中判断 MessagePool 是否为空
 	for {
 		if len(fullnode.MessagePool) != 0 {
-			// time.Sleep(time.Second)
+			time.Sleep(time.Second)
 			// 从消息池中取出消息
 			fullnode.mpmutex.Lock()
 			transactions := make([]*blockchain.Transaction, 0)
@@ -176,10 +176,12 @@ func (fullnode *Fullnode) AddToChain() {
 				fullnode.Pbft.Loger.Println("节点", fullnode.NodeID, "将共识后的区块", i, "上链")
 				request := fullnode.Pbft.MessagePool[fullnode.Pbft.MessageToCommit[i].Digest]
 				block := fullnode.RequestToBlock(request)
+				//回复block中的所有客户端
+				fullnode.ReplyClient(block)
 				blockHeight := fullnode.Blockchain.AddBlock(block)
 				fullnode.Pbft.Loger.Println("节点", fullnode.NodeID, "共识后的区块", i, "上链成功,当前区块链高度为", blockHeight)
-				fmt.Println("节点", fullnode.NodeID, "共识后的区块", i, "上链成功,当前区块链高度为", blockHeight)
-				fullnode.PrintBlockInfor(i)
+				// fmt.Println("节点", fullnode.NodeID, "共识后的区块", i, "上链成功,当前区块链高度为", blockHeight)
+				// fullnode.PrintBlockInfor(i)
 			}
 		}
 	}
@@ -220,4 +222,16 @@ func (fullnode *Fullnode) PrintBlockInfor(blockNo int) {
 		return
 	}
 	fmt.Println("区块高度：", block.Height, ", 区块中交易数量：", len(block.Transactions))
+}
+
+// 回复客户端
+func (fullnode *Fullnode) ReplyClient(block *blockchain.Block) {
+	for i := 0; i < len(block.Transactions); i++ {
+		tx := block.Transactions[i]
+		//回复客户端
+		info := fullnode.NodeID + "节点已将msgid:" + strconv.Itoa(tx.TxID) + "存入区块" + strconv.Itoa(block.Height) + "中,消息内容为：" + string(tx.Content)
+		fullnode.Pbft.Loger.Println("节点", fullnode.NodeID, "正在reply客户端")
+		fullnode.P2P.SendRequest([]byte(info), tx.Sender)
+		// fmt.Println("节点", fullnode.NodeID, "reply客户端完成:消息存入区块", block.Height, "中,消息内容为：", string(tx.Content))
+	}
 }

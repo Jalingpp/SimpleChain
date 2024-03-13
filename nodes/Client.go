@@ -68,7 +68,7 @@ func (client *Client) CreateClientP2PListen() {
 func (client *Client) HandleRequest(b []byte) {
 	// Code
 	currentTime := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Println(currentTime, client.GetClientID()+"recieves", string(b))
+	fmt.Println(currentTime, client.GetClientID(), "recieves:", string(b))
 }
 
 // 读取文件中的消息并依次发送给主节点
