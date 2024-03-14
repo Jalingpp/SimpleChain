@@ -9,7 +9,6 @@ There are two types of nodes: client and fullnode.
 Client initiates a request, packages it into a request message, and sends it to the primary fullnode through the network layer.
 Fullnode places the received client requests into a local message pool and starts an asynchronous thread for consensus.
 The consensus thread packages blocks from the message pool, converts them into request messages, and hands them over to the consensus layer for sorting.
-
 Finally, fullnodes obtain committed blocks and add them to the blockchain.
 ### Blockchain Layer
 The blockchain layer only contains some data structures.
