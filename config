@@ -1,4 +1,6 @@
-client,client1,127.0.0.1:8000
+client,client1,127.0.0.1:6000
+client,client2,127.0.0.1:7000
+client,client3,127.0.0.1:8000
 fullnode,node1,127.0.0.1:8001
 fullnode,node2,127.0.0.1:8002
 fullnode,node3,127.0.0.1:8003
