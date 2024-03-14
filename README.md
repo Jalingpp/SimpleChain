@@ -6,11 +6,8 @@ SimpleChain mainly contains four layers: nodes, blockchain, consensus, and netwo
 ![image](https://github.com/Jalingpp/SimpleChain/assets/26080098/f30e275a-6cb9-4de8-a170-0784fc991f75)
 ### Nodes Layer
 There are two types of nodes: client and fullnode. 
-
 Client initiates a request, packages it into a request message, and sends it to the primary fullnode through the network layer.
-
 Fullnode places the received client requests into a local message pool and starts an asynchronous thread for consensus.
-
 The consensus thread packages blocks from the message pool, converts them into request messages, and hands them over to the consensus layer for sorting.
 
 Finally, fullnodes obtain committed blocks and add them to the blockchain.
